@@ -14,9 +14,19 @@ browser.action.onClicked.addListener(async (tab) => {
     }
 
     try {
+        // Test 1: full URL
         console.log("[CookieExtractor] calling cookies.getAll for:", tab.url);
         const cookies = await browser.cookies.getAll({ url: tab.url });
-        console.log("[CookieExtractor] cookies count:", cookies.length, cookies);
+        console.log("[CookieExtractor] cookies count (full URL):", cookies.length);
+
+        // Test 2: origin only
+        const origin = new URL(tab.url).origin;
+        const cookiesByOrigin = await browser.cookies.getAll({ url: origin });
+        console.log("[CookieExtractor] cookies count (origin only):", cookiesByOrigin.length);
+
+        // Test 3: no filter at all
+        const allCookies = await browser.cookies.getAll({});
+        console.log("[CookieExtractor] cookies count (no filter):", allCookies.length);
 
         if (cookies.length === 0) {
             showBadge(tab.id, "0", "#6c757d");
