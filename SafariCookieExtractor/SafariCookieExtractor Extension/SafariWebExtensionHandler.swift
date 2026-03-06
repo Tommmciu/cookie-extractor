@@ -6,6 +6,7 @@
 import SafariServices
 import AppKit
 
+@available(macOS 11.0, *)
 class SafariWebExtensionHandler: NSObject, NSExtensionRequestHandling {
 
     func beginRequest(with context: NSExtensionContext) {
