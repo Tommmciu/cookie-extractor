@@ -1,5 +1,5 @@
 browser.action.onClicked.addListener(async (tab) => {
-    if (!tab.url || !tab.url.startsWith("http")) {
+    if (!tab.url || !/^https?:\/\//.test(tab.url)) {
         await browser.action.setBadgeText({ text: "✗", tabId: tab.id });
         await browser.action.setBadgeBackgroundColor({ color: "#dc3545", tabId: tab.id });
         setTimeout(async () => {
@@ -22,6 +22,7 @@ browser.action.onClicked.addListener(async (tab) => {
 
         const cookieHeader = cookies.map(c => `${c.name}=${c.value}`).join("; ");
 
+        // executeScript propagates the returned Promise — clipboard rejection is caught below
         await browser.scripting.executeScript({
             target: { tabId: tab.id },
             func: (text) => navigator.clipboard.writeText(text),
