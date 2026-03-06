@@ -1,10 +1,12 @@
+function showBadge(tabId, text, color) {
+    browser.action.setBadgeText({ text: text, tabId: tabId });
+    browser.action.setBadgeBackgroundColor({ color: color, tabId: tabId });
+    setTimeout(() => { browser.action.setBadgeText({ text: "", tabId: tabId }); }, 2000);
+}
+
 browser.action.onClicked.addListener(async (tab) => {
     if (!tab.url || !/^https?:\/\//.test(tab.url)) {
-        await browser.action.setBadgeText({ text: "✗", tabId: tab.id });
-        await browser.action.setBadgeBackgroundColor({ color: "#dc3545", tabId: tab.id });
-        setTimeout(async () => {
-            await browser.action.setBadgeText({ text: "", tabId: tab.id });
-        }, 2000);
+        showBadge(tab.id, "✗", "#dc3545");
         return;
     }
 
@@ -12,33 +14,25 @@ browser.action.onClicked.addListener(async (tab) => {
         const cookies = await browser.cookies.getAll({ url: tab.url });
 
         if (cookies.length === 0) {
-            await browser.action.setBadgeText({ text: "0", tabId: tab.id });
-            await browser.action.setBadgeBackgroundColor({ color: "#6c757d", tabId: tab.id });
-            setTimeout(async () => {
-                await browser.action.setBadgeText({ text: "", tabId: tab.id });
-            }, 2000);
+            showBadge(tab.id, "0", "#6c757d");
             return;
         }
 
         const cookieHeader = cookies.map(c => `${c.name}=${c.value}`).join("; ");
 
-        // executeScript propagates the returned Promise — clipboard rejection is caught below
-        await browser.scripting.executeScript({
-            target: { tabId: tab.id },
-            func: (text) => navigator.clipboard.writeText(text),
-            args: [cookieHeader]
-        });
-
-        await browser.action.setBadgeText({ text: "✓", tabId: tab.id });
-        await browser.action.setBadgeBackgroundColor({ color: "#28a745", tabId: tab.id });
-        setTimeout(async () => {
-            await browser.action.setBadgeText({ text: "", tabId: tab.id });
-        }, 2000);
+        // WebContent process is sandboxed from pasteboard; delegate write to native handler
+        browser.runtime.sendNativeMessage(
+            "net.jeniec.SafariCookieExtractor",
+            { text: cookieHeader },
+            (response) => {
+                if (response && response.success) {
+                    showBadge(tab.id, "✓", "#28a745");
+                } else {
+                    showBadge(tab.id, "✗", "#dc3545");
+                }
+            }
+        );
     } catch (error) {
-        await browser.action.setBadgeText({ text: "✗", tabId: tab.id });
-        await browser.action.setBadgeBackgroundColor({ color: "#dc3545", tabId: tab.id });
-        setTimeout(async () => {
-            await browser.action.setBadgeText({ text: "", tabId: tab.id });
-        }, 2000);
+        showBadge(tab.id, "✗", "#dc3545");
     }
 });
