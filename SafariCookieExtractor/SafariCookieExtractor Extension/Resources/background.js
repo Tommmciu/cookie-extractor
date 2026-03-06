@@ -25,11 +25,14 @@ browser.action.onClicked.addListener(async (tab) => {
         console.log("[CookieExtractor] cookies count (no filter):", allCookies.length);
 
         const stores = await browser.cookies.getAllCookieStores();
-        console.log("[CookieExtractor] cookie stores:", JSON.stringify(stores));
+        const tabStore = stores.find(s => s.tabIds.includes(tab.id));
+        console.log("[CookieExtractor] tab store:", tabStore ? tabStore.id : "not found");
 
-        const origin = new URL(tab.url).hostname;
-        const byDomain = await browser.cookies.getAll({ domain: origin });
-        console.log("[CookieExtractor] cookies count (by domain '" + origin + "'):", byDomain.length);
+        const byStore = await browser.cookies.getAll({ storeId: tabStore?.id });
+        console.log("[CookieExtractor] cookies count (by storeId):", byStore.length);
+
+        const byStoreAndUrl = await browser.cookies.getAll({ url: tab.url, storeId: tabStore?.id });
+        console.log("[CookieExtractor] cookies count (storeId + url):", byStoreAndUrl.length);
 
         if (cookies.length === 0) {
             showBadge(tab.id, "0", "#6c757d");
