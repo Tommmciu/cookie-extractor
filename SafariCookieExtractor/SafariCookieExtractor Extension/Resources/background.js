@@ -5,34 +5,20 @@ function showBadge(tabId, text, color) {
 }
 
 browser.action.onClicked.addListener(async (tab) => {
-    console.log("[CookieExtractor] clicked, tab:", tab.id, "url:", tab.url);
-
     if (!tab.url || !/^https?:\/\//.test(tab.url)) {
-        console.log("[CookieExtractor] invalid URL, aborting");
         showBadge(tab.id, "✗", "#dc3545");
         return;
     }
 
     try {
-        // Request host permissions if not yet granted — triggers Safari's native permission dialog
-        const granted = await browser.permissions.request({ origins: ["<all_urls>"] });
-        console.log("[CookieExtractor] permissions granted:", granted);
+        await browser.permissions.request({ origins: ["<all_urls>"] });
 
-        const cookies = await browser.cookies.getAll({ url: tab.url });
-        console.log("[CookieExtractor] cookies count (by url):", cookies.length);
-
-        const allCookies = await browser.cookies.getAll({});
-        console.log("[CookieExtractor] cookies count (no filter):", allCookies.length);
-
+        // Safari uses multiple cookie stores; find the one for this tab
         const stores = await browser.cookies.getAllCookieStores();
         const tabStore = stores.find(s => s.tabIds.includes(tab.id));
-        console.log("[CookieExtractor] tab store:", tabStore ? tabStore.id : "not found");
+        const storeId = tabStore?.id;
 
-        const byStore = await browser.cookies.getAll({ storeId: tabStore?.id });
-        console.log("[CookieExtractor] cookies count (by storeId):", byStore.length);
-
-        const byStoreAndUrl = await browser.cookies.getAll({ url: tab.url, storeId: tabStore?.id });
-        console.log("[CookieExtractor] cookies count (storeId + url):", byStoreAndUrl.length);
+        const cookies = await browser.cookies.getAll({ url: tab.url, storeId });
 
         if (cookies.length === 0) {
             showBadge(tab.id, "0", "#6c757d");
@@ -40,14 +26,12 @@ browser.action.onClicked.addListener(async (tab) => {
         }
 
         const cookieHeader = cookies.map(c => `${c.name}=${c.value}`).join("; ");
-        console.log("[CookieExtractor] formatted header length:", cookieHeader.length);
 
         // WebContent process is sandboxed from pasteboard; delegate write to native handler
         browser.runtime.sendNativeMessage(
             "net.jeniec.SafariCookieExtractor",
             { text: cookieHeader },
             (response) => {
-                console.log("[CookieExtractor] native response:", response, "lastError:", browser.runtime.lastError);
                 if (response && response.success) {
                     showBadge(tab.id, "✓", "#28a745");
                 } else {
@@ -56,7 +40,6 @@ browser.action.onClicked.addListener(async (tab) => {
             }
         );
     } catch (error) {
-        console.log("[CookieExtractor] error:", error);
         showBadge(tab.id, "✗", "#dc3545");
     }
 });
