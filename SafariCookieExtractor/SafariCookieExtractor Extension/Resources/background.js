@@ -19,7 +19,17 @@ browser.action.onClicked.addListener(async (tab) => {
         console.log("[CookieExtractor] permissions granted:", granted);
 
         const cookies = await browser.cookies.getAll({ url: tab.url });
-        console.log("[CookieExtractor] cookies count:", cookies.length);
+        console.log("[CookieExtractor] cookies count (by url):", cookies.length);
+
+        const allCookies = await browser.cookies.getAll({});
+        console.log("[CookieExtractor] cookies count (no filter):", allCookies.length);
+
+        const stores = await browser.cookies.getAllCookieStores();
+        console.log("[CookieExtractor] cookie stores:", JSON.stringify(stores));
+
+        const origin = new URL(tab.url).hostname;
+        const byDomain = await browser.cookies.getAll({ domain: origin });
+        console.log("[CookieExtractor] cookies count (by domain '" + origin + "'):", byDomain.length);
 
         if (cookies.length === 0) {
             showBadge(tab.id, "0", "#6c757d");
