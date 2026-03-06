@@ -24,5 +24,6 @@
         "default_title": "Copy Cookies"
     },
 
-    "permissions": [ "cookies", "activeTab", "<all_urls>" ]
+    "permissions": [ "cookies", "activeTab" ],
+    "host_permissions": [ "<all_urls>" ]
 }
