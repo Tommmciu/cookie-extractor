@@ -4,7 +4,7 @@
         "description": "The display name for the extension."
     },
     "extension_description": {
-        "message": "This is SafariCookieExtractor Extension. You should tell us what your extension does here.",
+        "message": "Copy all cookies for the current page to your clipboard with a single click.",
         "description": "Description of what the extension does."
     }
 }
