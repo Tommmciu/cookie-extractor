@@ -28,21 +28,28 @@ browser.action.onClicked.addListener(async (tab) => {
         }
 
         const cookieHeader = cookies.map(c => `${c.name}=${c.value}`).join("; ");
-        console.log("[CookieExtractor] sending to native, length:", cookieHeader.length);
+        console.log("[CookieExtractor] injecting clipboard script, length:", cookieHeader.length);
 
-        // WebContent process is sandboxed from pasteboard; delegate write to native handler
-        browser.runtime.sendNativeMessage(
-            "net.jeniec.SafariCookieExtractor",
-            { text: cookieHeader },
-            (response) => {
-                console.log("[CookieExtractor] native response:", response, "lastError:", browser.runtime.lastError);
-                if (response && response.success) {
-                    showBadge(tab.id, "✓", "#28a745");
-                } else {
-                    showBadge(tab.id, "✗", "#dc3545");
-                }
-            }
-        );
+        // Use execCommand('copy') via injected script — avoids pboard XPC sandbox restriction
+        const results = await browser.scripting.executeScript({
+            target: { tabId: tab.id },
+            func: (text) => {
+                const el = document.createElement("textarea");
+                el.value = text;
+                el.style.cssText = "position:fixed;opacity:0;pointer-events:none;";
+                document.body.appendChild(el);
+                el.focus();
+                el.select();
+                const ok = document.execCommand("copy");
+                document.body.removeChild(el);
+                return ok;
+            },
+            args: [cookieHeader]
+        });
+
+        console.log("[CookieExtractor] execCommand result:", results);
+        const success = results?.[0]?.result === true;
+        showBadge(tab.id, success ? "✓" : "✗", success ? "#28a745" : "#dc3545");
     } catch (error) {
         console.log("[CookieExtractor] caught error:", error?.message, error);
         showBadge(tab.id, "✗", "#dc3545");
