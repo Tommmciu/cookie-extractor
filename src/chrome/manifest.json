@@ -1,0 +1,30 @@
+{
+    "manifest_version": 3,
+    "default_locale": "en",
+
+    "name": "__MSG_extension_name__",
+    "description": "__MSG_extension_description__",
+    "version": "1.0",
+
+    "icons": {
+        "48": "icons/icon-48.png",
+        "96": "icons/icon-96.png",
+        "128": "icons/icon-128.png",
+        "256": "icons/icon-256.png",
+        "512": "icons/icon-512.png"
+    },
+
+    "background": {
+        "service_worker": "background.js",
+        "type": "module"
+    },
+
+    "action": {
+        "default_icon": "icons/icon-48.png",
+        "default_title": "Copy Cookies",
+        "default_popup": "popup.html"
+    },
+
+    "permissions": [ "cookies", "activeTab", "scripting" ],
+    "host_permissions": [ "<all_urls>" ]
+}
