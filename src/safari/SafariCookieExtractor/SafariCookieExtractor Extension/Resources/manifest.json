@@ -1,6 +1,7 @@
 {
     "manifest_version": 3,
     "default_locale": "en",
+    "_comment": "This extension shares background.js, content.js, and messages.json with the Chrome extension in src/extension/",
 
     "name": "__MSG_extension_name__",
     "description": "__MSG_extension_description__",
