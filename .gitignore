@@ -1,3 +1,7 @@
 dist/
 build/*
 !build/build-chrome-extension.js
+
+# Chrome extension build output
+src/chrome/dist/
+chrome-extension-release.zip

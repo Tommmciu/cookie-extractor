@@ -1,0 +1,8 @@
+{
+  "name": "safari-cookie-extractor",
+  "version": "1.0.0",
+  "description": "Cookie extractor for Safari and Chrome",
+  "scripts": {
+    "build:chrome": "node build/build-chrome-extension.js"
+  }
+}
