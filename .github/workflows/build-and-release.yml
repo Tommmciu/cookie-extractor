@@ -46,3 +46,47 @@ jobs:
           name: chrome-extension
           path: chrome-extension-release.zip
           retention-days: 5
+
+  release:
+    name: Create Release
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Conventional Changelog
+        id: changelog
+        uses: TriPSs/conventional-changelog-action@v4
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          version-file: 'package.json'
+          version-path: 'version'
+          create-summary: true
+          skip-on-empty: false
+
+      - name: Download Safari artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: safari-extension
+
+      - name: Download Chrome artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: chrome-extension
+
+      - name: Create GitHub Release
+        if: steps.changelog.outputs.skipped == 'false'
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ steps.changelog.outputs.tag }}
+          body: ${{ steps.changelog.outputs.clean_changelog }}
+          files: |
+            SafariCookieExtractor.app.zip
+            chrome-extension-release.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
