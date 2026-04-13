@@ -19,3 +19,13 @@ jobs:
 
       - name: Install npm dependencies
         run: npm install
+
+      - name: Build Safari Extension
+        run: |
+          cd src/safari/SafariCookieExtractor
+          xcodebuild -scheme SafariCookieExtractor -configuration Release -derivedDataPath build/Release
+          
+      - name: Archive Safari app
+        run: |
+          cd src/safari/SafariCookieExtractor/build/Release
+          zip -r ../../../SafariCookieExtractor.app.zip Products/Release/SafariCookieExtractor.app
