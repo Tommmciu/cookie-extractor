@@ -1,4 +1,13 @@
-# 1.1.0 (2026-04-13)
+## [1.1.1](https://github.com/Tommmciu/cookie-extractor/compare/v1.1.0...v1.1.1) (2026-04-13)
+
+
+### Bug Fixes
+
+* simplify cookie extraction in Chrome - remove unnecessary store lookup ([ffe28c8](https://github.com/Tommmciu/cookie-extractor/commit/ffe28c82031bb43e997b332b648f38613813036b))
+
+
+
+# [1.1.0](https://github.com/Tommmciu/cookie-extractor/compare/8cd45c081ad4a5a83dd22f1ed42b3b92e4b09313...v1.1.0) (2026-04-13)
 
 
 ### Bug Fixes
