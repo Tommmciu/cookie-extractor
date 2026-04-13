@@ -30,21 +30,11 @@ jobs:
           cd src/safari/SafariCookieExtractor/build/Release
           zip -r ../../../SafariCookieExtractor.app.zip Build/Products/Release/SafariCookieExtractor.app
 
-      - name: Build Chrome Extension
-        run: npm run build:chrome
-
       - name: Upload Safari artifact
         uses: actions/upload-artifact@v4
         with:
           name: safari-extension
           path: src/safari/SafariCookieExtractor.app.zip
-          retention-days: 5
-
-      - name: Upload Chrome artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: chrome-extension
-          path: chrome-extension-release.zip
           retention-days: 5
 
   release:
@@ -74,19 +64,12 @@ jobs:
         with:
           name: safari-extension
 
-      - name: Download Chrome artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: chrome-extension
-
       - name: Create GitHub Release
         if: steps.changelog.outputs.skipped == 'false'
         uses: softprops/action-gh-release@v1
         with:
           tag_name: ${{ steps.changelog.outputs.tag }}
           body: ${{ steps.changelog.outputs.clean_changelog }}
-          files: |
-            SafariCookieExtractor.app.zip
-            chrome-extension-release.zip
+          files: SafariCookieExtractor.app.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
