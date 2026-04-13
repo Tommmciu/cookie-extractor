@@ -23,7 +23,7 @@ jobs:
       - name: Build Safari Extension
         run: |
           cd src/safari/SafariCookieExtractor
-          xcodebuild -scheme SafariCookieExtractor -configuration Release -derivedDataPath build/Release
+          xcodebuild -scheme SafariCookieExtractor -configuration Release -derivedDataPath build/Release CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO
           
       - name: Archive Safari app
         run: |
