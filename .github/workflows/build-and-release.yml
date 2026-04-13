@@ -29,3 +29,6 @@ jobs:
         run: |
           cd src/safari/SafariCookieExtractor/build/Release
           zip -r ../../../SafariCookieExtractor.app.zip Products/Release/SafariCookieExtractor.app
+
+      - name: Build Chrome Extension
+        run: npm run build:chrome
