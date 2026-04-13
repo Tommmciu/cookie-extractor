@@ -32,3 +32,17 @@ jobs:
 
       - name: Build Chrome Extension
         run: npm run build:chrome
+
+      - name: Upload Safari artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: safari-extension
+          path: src/safari/SafariCookieExtractor.app.zip
+          retention-days: 5
+
+      - name: Upload Chrome artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: chrome-extension
+          path: chrome-extension-release.zip
+          retention-days: 5
