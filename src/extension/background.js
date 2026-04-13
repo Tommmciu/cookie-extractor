@@ -11,15 +11,8 @@ async function extractAndCopyCookies(tabId, url) {
     }
 
     try {
-        await chrome.permissions.request({ origins: ["<all_urls>"] });
-
-        // Chrome uses multiple cookie stores; find the one for this tab
-        const stores = await chrome.cookies.getAllCookieStores();
-        const tabStore = stores.find(s => s.tabIds && s.tabIds.includes(tabId));
-        const storeId = tabStore?.id;
-        console.log("[CookieExtractor] storeId:", storeId);
-
-        const cookies = await chrome.cookies.getAll({ url: url, storeId });
+        // Extract cookies for the URL - chrome.cookies.getAll handles multiple stores automatically
+        const cookies = await chrome.cookies.getAll({ url: url });
         console.log("[CookieExtractor] cookies count:", cookies.length);
 
         if (cookies.length === 0) {
